@@ -1,6 +1,6 @@
 use crate::store::Store;
 use diesel::prelude::*;
-use uuid::{Uuid, uuid};
+use uuid::Uuid;
 
 #[derive(Queryable, Selectable, Insertable)]
 #[diesel(table_name = crate::schema::user)]
