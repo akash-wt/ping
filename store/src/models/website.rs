@@ -6,12 +6,11 @@ use uuid::Uuid;
 #[derive(Queryable, Selectable, Insertable)]
 #[diesel(table_name = crate::schema::website)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
-
 pub struct Website {
-    id: String,
-    url: String,
-    time_added: chrono::NaiveDateTime,
-    user_id: String,
+    pub id: String,
+    pub url: String,
+    pub time_added: chrono::NaiveDateTime,
+    pub user_id: String,
 }
 
 impl Store {
