@@ -5,7 +5,8 @@ use crate::{
     request_output::{CreateUserOutput, SigninOutput},
 };
 use poem::{
-    handler,
+    Error, handler,
+    http::StatusCode,
     web::{Data, Json},
 };
 use store::store::Store;
@@ -14,28 +15,36 @@ use store::store::Store;
 pub fn sign_up(
     Json(data): Json<CreateUserInput>,
     Data(s): Data<&Arc<Mutex<Store>>>,
-) -> Json<CreateUserOutput> {
+) -> Result<Json<CreateUserOutput>, Error> {
     let mut loacked_s = s.lock().unwrap();
-    let user_id = loacked_s.sign_up(data.username, data.password).unwrap();
+    let user_id = loacked_s
+        .sign_up(data.username, data.password)
+        .map_err(|_| Error::from_status(StatusCode::CONFLICT))?;
 
     let response = CreateUserOutput {
         id: user_id.to_string(),
     };
 
-    Json(response)
+    Ok(Json(response))
 }
 
 #[handler]
 pub fn sign_in(
     Json(data): Json<CreateUserInput>,
     Data(s): Data<&Arc<Mutex<Store>>>,
-) -> Json<SigninOutput> {
+) -> Result<Json<SigninOutput>, Error> {
     let mut locked_s = s.lock().unwrap();
 
-    let _exists = locked_s.sign_in(data.username, data.password).unwrap();
-    let response = SigninOutput{
-        jwt:String::from("aks")
-    } ;
+    let id = locked_s.sign_in(data.username, data.password);
 
-    Json(response)
-}   
+    match id {
+        Ok(u_id) => {
+            let response = SigninOutput {
+                jwt: String::from(u_id),
+            };
+
+            Ok(Json(response))
+        }
+        Err(_) => Err(Error::from_status(StatusCode::UNAUTHORIZED)),
+    }
+}
