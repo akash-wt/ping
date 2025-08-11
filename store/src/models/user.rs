@@ -1,5 +1,5 @@
 use crate::store::Store;
-use diesel::prelude::*;
+use diesel::{prelude::*, result::Error};
 use uuid::Uuid;
 
 #[derive(Queryable, Selectable, Insertable)]
@@ -12,7 +12,7 @@ pub struct User {
 }
 
 impl Store {
-    pub fn sign_in(
+    pub fn sign_up(
         &mut self,
         username: String,
         password: String,
@@ -32,11 +32,11 @@ impl Store {
         Ok(user_id.to_string())
     }
 
-    pub fn sign_up(
+    pub fn sign_in(
         &mut self,
         username_input: String,
         password_input: String,
-    ) -> Result<bool, diesel::result::Error> {
+    ) -> Result<String, diesel::result::Error> {
         use crate::schema::user::dsl::*;
 
         let user_result = user
@@ -45,9 +45,9 @@ impl Store {
             .first(&mut self.conn)?;
 
         if user_result.password != password_input {
-            return Ok(false);
+            return Err(diesel::result::Error::NotFound);
         }
 
-        Ok(true)
+        Ok(user_result.id)
     }
 }
