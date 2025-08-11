@@ -4,12 +4,20 @@ use crate::{
     request_input::CreateUserInput,
     request_output::{CreateUserOutput, SigninOutput},
 };
+use jsonwebtoken::{encode, EncodingKey, Header};
 use poem::{
     Error, handler,
     http::StatusCode,
     web::{Data, Json},
 };
+use serde::{Deserialize, Serialize};
 use store::store::Store;
+
+#[derive(Debug, Serialize, Deserialize)]
+struct Claims {
+    sub: String,
+    exp: usize,
+}
 
 #[handler]
 pub fn sign_up(
@@ -39,8 +47,19 @@ pub fn sign_in(
 
     match id {
         Ok(u_id) => {
+            let my_claims = Claims {
+                sub: u_id,
+                exp: 111111111,
+            };
+
+            let token = encode(
+                &Header::default(),
+                &my_claims,
+                &EncodingKey::from_secret("secret".as_ref()),
+            ).map_err(|_| Error::from_status(StatusCode::UNAUTHORIZED))?;
+
             let response = SigninOutput {
-                jwt: String::from(u_id),
+                jwt: String::from(token),
             };
 
             Ok(Json(response))

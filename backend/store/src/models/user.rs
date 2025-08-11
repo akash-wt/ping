@@ -1,5 +1,5 @@
 use crate::store::Store;
-use diesel::{prelude::*, result::Error};
+use diesel::{prelude::* };
 use uuid::Uuid;
 
 #[derive(Queryable, Selectable, Insertable)]
