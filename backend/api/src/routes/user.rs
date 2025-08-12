@@ -1,10 +1,9 @@
 use std::sync::{Arc, Mutex};
 
 use crate::{
-    request_input::CreateUserInput,
-    request_output::{CreateUserOutput, SigninOutput},
+    config::Config, request_input::CreateUserInput, request_output::{CreateUserOutput, SigninOutput}
 };
-use jsonwebtoken::{encode, EncodingKey, Header};
+use jsonwebtoken::{EncodingKey, Header, encode};
 use poem::{
     Error, handler,
     http::StatusCode,
@@ -14,9 +13,9 @@ use serde::{Deserialize, Serialize};
 use store::store::Store;
 
 #[derive(Debug, Serialize, Deserialize)]
-struct Claims {
-    sub: String,
-    exp: usize,
+pub struct Claims {
+    pub sub: String,
+    pub exp: usize,
 }
 
 #[handler]
@@ -52,11 +51,15 @@ pub fn sign_in(
                 exp: 111111111,
             };
 
+            let config = Config::default();
+            println!("{}",config.jwt_secret);
+
             let token = encode(
                 &Header::default(),
                 &my_claims,
-                &EncodingKey::from_secret("secret".as_ref()),
-            ).map_err(|_| Error::from_status(StatusCode::UNAUTHORIZED))?;
+                &EncodingKey::from_secret(config.jwt_secret.as_ref()),
+            )
+            .map_err(|_| Error::from_status(StatusCode::UNAUTHORIZED))?;
 
             let response = SigninOutput {
                 jwt: String::from(token),

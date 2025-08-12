@@ -1,5 +1,6 @@
 use crate::store::Store;
-use diesel::{prelude::* };
+use bcrypt::{DEFAULT_COST, hash, verify};
+use diesel::{prelude::*, result::Error};
 use uuid::Uuid;
 
 #[derive(Queryable, Selectable, Insertable)]
@@ -18,9 +19,12 @@ impl Store {
         password: String,
     ) -> Result<String, diesel::result::Error> {
         let user_id = Uuid::new_v4();
+
+        let hashed_password = hash(password, DEFAULT_COST).map_err(|_| Error::NotFound)?;
+
         let u = User {
             username,
-            password,
+            password: hashed_password,
             id: user_id.to_string(),
         };
 
@@ -44,8 +48,11 @@ impl Store {
             .select(User::as_select())
             .first(&mut self.conn)?;
 
-        if user_result.password != password_input {
-            return Err(diesel::result::Error::NotFound);
+        let is_valid =
+            verify(password_input, &user_result.password).map_err(|_| Error::NotFound)?;
+
+        if !is_valid {
+            return Err(Error::NotFound);
         }
 
         Ok(user_result.id)
