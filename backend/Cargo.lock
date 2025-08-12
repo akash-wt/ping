@@ -917,6 +917,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "pusher"
+version = "0.1.0"
+
+[[package]]
 name = "quote"
 version = "1.0.40"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1593,6 +1597,10 @@ checksum = "6f42320e61fe2cfd34354ecb597f86f413484a798ba44a8ca1165c58d42da6c1"
 dependencies = [
  "bitflags",
 ]
+
+[[package]]
+name = "worker"
+version = "0.1.0"
 
 [[package]]
 name = "zeroize"
