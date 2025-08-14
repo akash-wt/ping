@@ -11,3 +11,4 @@ tokio = {version = "1.47.1" , features = ["full"]}
 store= {path= "../store"}
 dotenvy = "0.15.7"
 jsonwebtoken = "9"
+redis-client = {path = "../redis-client"}

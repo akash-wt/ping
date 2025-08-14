@@ -9,13 +9,13 @@ use poem::{
     handler,
     web::{Data, Json, Path},
 };
-use store::{schema::website::user_id, store::Store};
+use store::store::Store;
 
 #[handler]
 pub fn get_website(
     Path(website_id): Path<String>,
     Data(s): Data<&Arc<Mutex<Store>>>,
-    UserId(auth_user_id): UserId,
+    UserId(_auth_user_id): UserId,
 ) -> Json<GetWebsiteOutput> {
     let mut locked_s = s.lock().unwrap();
 

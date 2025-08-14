@@ -6,7 +6,7 @@ use crate::{config::Config, routes::user::Claims};
 pub struct UserId(pub String);
 
 impl<'a> FromRequest<'a> for UserId {
-    async fn from_request(req: &'a Request, body: &mut RequestBody) -> Result<Self> {
+    async fn from_request(req: &'a Request, _body: &mut RequestBody) -> Result<Self> {
         let token = req
             .headers()
             .get("Authorization")
@@ -14,7 +14,7 @@ impl<'a> FromRequest<'a> for UserId {
             .ok_or_else(|| Error::from_string("missing token", StatusCode::UNAUTHORIZED))?;
 
         let config = Config::default();
-        println!("{}",token);
+        // println!("{}",token);
 
         let token_data = decode::<Claims>(
             &token,
