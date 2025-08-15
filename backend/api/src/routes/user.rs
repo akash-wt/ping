@@ -62,7 +62,7 @@ pub fn sign_in(
             .map_err(|_| Error::from_status(StatusCode::UNAUTHORIZED))?;
 
             let response = SigninOutput {
-                jwt: String::from(token),
+                jwt: token,
             };
 
             Ok(Json(response))

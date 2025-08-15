@@ -1,9 +1,8 @@
 use std::io::Write;
-
+use uuid::Uuid;
 use crate::store::Store;
 use chrono::Utc;
 use diesel::{deserialize::{FromSql, FromSqlRow}, expression::AsExpression, pg::{Pg, PgValue}, prelude::*, serialize::{IsNull, Output, ToSql}};
-use uuid::Uuid;
 
 #[derive(Queryable, Selectable, Insertable)]
 #[diesel(table_name = crate::schema::website)]
@@ -44,7 +43,7 @@ impl FromSql<crate::schema::sql_types::WebsiteStatus, Pg> for WebsiteStatus {
             b"Up" => Ok(WebsiteStatus::Up),
             b"Down" => Ok(WebsiteStatus::Down),
             b"Unknown" => Ok(WebsiteStatus::Unknown),
-            v => Err(format!("Unrecognized WebsiteStatus variant: {:?}", v).into()),
+             v => Err(format!("Unrecognized WebsiteStatus variant: {v:?}").into()),
         }
     }
 }

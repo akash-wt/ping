@@ -17,7 +17,7 @@ impl<'a> FromRequest<'a> for UserId {
         // println!("{}",token);
 
         let token_data = decode::<Claims>(
-            &token,
+            token,
             &DecodingKey::from_secret(config.jwt_secret.as_ref()),
             &Validation::default(),
         )
