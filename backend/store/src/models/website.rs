@@ -6,6 +6,8 @@ use uuid::Uuid;
 #[derive(Queryable, Selectable, Insertable)]
 #[diesel(table_name = crate::schema::website)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
+
+#[derive(Debug)]
 pub struct Website {
     pub id: String,
     pub url: String,
@@ -43,6 +45,16 @@ impl Store {
             .filter(id.eq(input_id))
             .select(Website::as_select())
             .first(&mut self.conn)?;
+
+        Ok(website_result)
+    }
+
+    pub fn get_website_bulk(&mut self) -> Result<Vec<Website>, diesel::result::Error> {
+        use crate::schema::website::dsl::*;
+
+        let website_result = website
+            .select(Website::as_select())
+            .load::<Website>(&mut self.conn)?;
 
         Ok(website_result)
     }
