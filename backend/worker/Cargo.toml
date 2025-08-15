@@ -10,3 +10,4 @@ store= { path = "../store"}
 tokio = {version = "1.47.1" , features = ["full"]}
 dotenvy = "0.15.7"
 anyhow = "1.0.99"
+reqwest = "0.12.23"

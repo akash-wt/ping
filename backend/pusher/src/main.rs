@@ -12,19 +12,17 @@ async fn main() -> Result<(), std::io::Error> {
     let mut locked_s = s.lock().unwrap();
     let redis_client = RedisClient::new().await.unwrap();
 
-    let mut interval = time::interval(Duration::from_secs(3 * 60));
+    let mut interval = time::interval(Duration::from_secs(3 ));
 
     loop {
         interval.tick().await;
 
-        let websites = {
-            locked_s.get_website_bulk()
-        };
+        let websites = { locked_s.get_website_bulk() };
 
         match websites {
             Ok(_) => match websites {
                 Ok(w) => {
-                    if let Err(err) = push_to_stream(&redis_client, &w, &"website_stream").await {
+                    if let Err(err) = push_to_stream(&redis_client, &w).await {
                         eprintln!("Redis push error: {:?}", err);
                     } else {
                         println!("Pushed {} websites to Redis", w.len());

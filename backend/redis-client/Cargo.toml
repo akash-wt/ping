@@ -6,4 +6,6 @@ edition = "2024"
 [dependencies]
 dotenvy = "0.15.7"
 redis = { version = "0.32.5", features = ["tokio-comp"] }
+reqwest = "0.12.23"
 tokio = { version =  "1.47.1", features = ["full"] }
+store= { path = "../store"}
