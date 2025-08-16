@@ -101,7 +101,6 @@ impl RedisClient {
                     .and_then(|v| String::from_redis_value(v).ok())
                     .unwrap_or_default();
 
-                // println!("processing -> id={} url={:?} wid={}", entry.id, url, wid);
 
                 let url = normalize_url(&url);
 

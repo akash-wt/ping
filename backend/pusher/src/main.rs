@@ -12,7 +12,7 @@ async fn main() -> Result<(), std::io::Error> {
     let mut locked_s = s.lock().unwrap();
     let redis_client = RedisClient::new().await.unwrap();
 
-    let mut interval = time::interval(Duration::from_secs(3 ));
+    let mut interval = time::interval(Duration::from_secs(3 * 60));
 
     loop {
         interval.tick().await;

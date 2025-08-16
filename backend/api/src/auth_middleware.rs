@@ -21,7 +21,13 @@ impl<'a> FromRequest<'a> for UserId {
             &DecodingKey::from_secret(config.jwt_secret.as_ref()),
             &Validation::default(),
         )
-        .map_err(|_| Error::from_string("missing malformed!", StatusCode::UNAUTHORIZED))?;
+        .map_err(|err| match err.kind() {
+            jsonwebtoken::errors::ErrorKind::ExpiredSignature => {
+                Error::from_string("token expired", StatusCode::UNAUTHORIZED)
+            }
+            _ => Error::from_string("invalid token", StatusCode::UNAUTHORIZED),
+        })?;
+
 
         Ok(UserId(token_data.claims.sub))
     }

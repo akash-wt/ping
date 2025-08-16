@@ -36,7 +36,6 @@ pub struct WebsiteTick {
     pub createdAt: chrono::NaiveDateTime,
 }
 
-// Implement mapping between Postgres enum <-> Rust enum
 impl FromSql<crate::schema::sql_types::WebsiteStatus, Pg> for WebsiteStatus {
     fn from_sql(bytes: PgValue) -> diesel::deserialize::Result<Self> {
         match bytes.as_bytes() {

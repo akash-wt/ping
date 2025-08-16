@@ -1,8 +1,9 @@
-use std::sync::{Arc, Mutex};
-
 use crate::{
-    config::Config, request_input::CreateUserInput, request_output::{CreateUserOutput, SigninOutput}
+    config::Config,
+    request_input::CreateUserInput,
+    request_output::{CreateUserOutput, SigninOutput},
 };
+use chrono::{Duration, Utc};
 use jsonwebtoken::{EncodingKey, Header, encode};
 use poem::{
     Error, handler,
@@ -10,6 +11,7 @@ use poem::{
     web::{Data, Json},
 };
 use serde::{Deserialize, Serialize};
+use std::sync::{Arc, Mutex};
 use store::store::Store;
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -48,11 +50,11 @@ pub fn sign_in(
         Ok(u_id) => {
             let my_claims = Claims {
                 sub: u_id,
-                exp: 111111111,
+                exp: (Utc::now() + Duration::days(30)).timestamp() as usize,
             };
 
             let config = Config::default();
-            println!("{}",config.jwt_secret);
+            println!("{}", config.jwt_secret);
 
             let token = encode(
                 &Header::default(),
@@ -61,9 +63,7 @@ pub fn sign_in(
             )
             .map_err(|_| Error::from_status(StatusCode::UNAUTHORIZED))?;
 
-            let response = SigninOutput {
-                jwt: token,
-            };
+            let response = SigninOutput { jwt: token };
 
             Ok(Json(response))
         }
