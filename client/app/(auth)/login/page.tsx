@@ -5,13 +5,15 @@ import { toast } from "react-hot-toast";
 import { useState } from "react";
 import axios from "axios";
 import { BACKEND_URL } from "@/app/config";
-import Google from "@/app/dashboard/social/google";
-import Github from "@/app/dashboard/social/github";
+import Google from "@/components/social/google";
+import Github from "@/components/social/github";
+import { useRouter } from "next/navigation";
 
 export default function Signup() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
+  const router = useRouter();
 
   async function handleLogin() {
     if (!username || !password) {
@@ -34,7 +36,9 @@ export default function Signup() {
       } else {
         sessionStorage.setItem("token", res.data.jwt);
       }
+
       toast.success("Login successfully!");
+      router.push("/dashboard");
     } catch (err) {
       toast.error(`Signup failed: ${err}`);
     }
