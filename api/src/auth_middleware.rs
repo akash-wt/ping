@@ -13,8 +13,9 @@ impl<'a> FromRequest<'a> for UserId {
             .and_then(|value| value.to_str().ok())
             .ok_or_else(|| Error::from_string("missing token", StatusCode::UNAUTHORIZED))?;
 
+
         let config = Config::default();
-        // println!("{}",token);
+        println!("{:?}::",token);
 
         let token_data = decode::<Claims>(
             token,
