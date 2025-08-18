@@ -1,8 +1,15 @@
-use std::io::Write;
-use uuid::Uuid;
 use crate::store::Store;
 use chrono::Utc;
-use diesel::{deserialize::{FromSql, FromSqlRow}, expression::AsExpression, pg::{Pg, PgValue}, prelude::*, serialize::{IsNull, Output, ToSql}};
+use diesel::{
+    deserialize::{FromSql, FromSqlRow},
+    expression::AsExpression,
+    pg::{Pg, PgValue},
+    prelude::*,
+    serialize::{IsNull, Output, ToSql},
+};
+use serde::Serialize;
+use std::io::Write;
+use uuid::Uuid;
 
 #[derive(Queryable, Selectable, Insertable)]
 #[diesel(table_name = crate::schema::website)]
@@ -17,6 +24,7 @@ pub struct Website {
 
 #[derive(Debug, Clone, Copy, AsExpression, FromSqlRow)]
 #[diesel(sql_type = crate::schema::sql_types::WebsiteStatus)]
+#[derive(Serialize)]
 pub enum WebsiteStatus {
     Up,
     Down,
@@ -42,7 +50,7 @@ impl FromSql<crate::schema::sql_types::WebsiteStatus, Pg> for WebsiteStatus {
             b"Up" => Ok(WebsiteStatus::Up),
             b"Down" => Ok(WebsiteStatus::Down),
             b"Unknown" => Ok(WebsiteStatus::Unknown),
-             v => Err(format!("Unrecognized WebsiteStatus variant: {v:?}").into()),
+            v => Err(format!("Unrecognized WebsiteStatus variant: {v:?}").into()),
         }
     }
 }
@@ -57,7 +65,6 @@ impl ToSql<crate::schema::sql_types::WebsiteStatus, Pg> for WebsiteStatus {
         Ok(IsNull::No)
     }
 }
-
 
 impl Store {
     pub fn create_website(
@@ -126,5 +133,21 @@ impl Store {
             .get_result(&mut self.conn)?;
 
         Ok(website_result)
+    }
+
+    pub fn get_website_ticks(
+        &mut self,
+        uid: String,
+    ) -> Result<Vec<WebsiteTick>, diesel::result::Error> {
+        use crate::schema::website::dsl as w;
+        use crate::schema::website_tick::dsl as wt;
+
+        let ticks = wt::website_tick
+            .inner_join(w::website.on(wt::website_id.eq(w::id)))
+            .filter(w::user_id.eq(uid))
+            .select(WebsiteTick::as_select())
+            .load::<WebsiteTick>(&mut self.conn)?;
+
+        Ok(ticks)
     }
 }

@@ -17,7 +17,7 @@ async fn main() -> Result<(), std::io::Error> {
     loop {
         interval.tick().await;
 
-        let websites = { locked_s.get_website_bulk() };
+        let websites = locked_s.get_website_bulk();
 
         match websites {
             Ok(_) => match websites {

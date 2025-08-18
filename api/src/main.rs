@@ -7,7 +7,7 @@ use store::store::Store;
 
 use crate::routes::{
     user::{sign_in, sign_up},
-    website::{create_website, get_website},
+    website::{create_website, get_website_ticks},
 };
 pub mod auth_middleware;
 pub mod config;
@@ -20,7 +20,7 @@ async fn main() -> Result<(), std::io::Error> {
     let s = Arc::new(Mutex::new(Store::new().unwrap()));
 
     let app = Route::new()
-        .at("/status/:website_id", get(get_website))
+        .at("/get_website_ticks", get(get_website_ticks))
         .at("/website", post(create_website))
         .at("/user/signup", post(sign_up))
         .at("/user/signin", post(sign_in))
